@@ -7,42 +7,34 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,android.location.LocationListener{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, android.location.LocationListener, GoogleMap.OnMapClickListener {
     private static final int REQUEST_ACCESS_LOCATION_CODE = 16;
     private boolean checkBtn = false;
     private GoogleMap mMap;
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
-
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
+    private Location mLocation;
+    private static final long MIN_TIME_BW_UPDATES = 1000; // 1 seconds
     private Button starButton;
     private GoogleApiClient apiClient;
     private List<MLocation> mLine;
@@ -54,7 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        if(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)&& hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
+        if (hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) && hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             getLastUnknownLocation();
         } else {
             requestPermissionsSafely(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -65,27 +57,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View v) {
-                if (checkBtn) {
+                if (!checkBtn) {
                     starButton.setText("STOP");
                     beginTracking();
                     mLine = new ArrayList<>();
                     starButton.setBackgroundResource(R.drawable.bg_button_color_pressed);
-                } else if(!checkBtn) {
+                } else if (checkBtn) {
                     starButton.setText("START");
+
                     stopTracking();
                     starButton.setBackgroundResource(R.drawable.bg_button_color_unpressed);
                 }
+                LatLng na = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+                addMarker(na);
                 checkBtn = !checkBtn;
             }
         });
 
         mapFragment.getMapAsync(this);
+
     }
 
     private void stopTracking() {
     }
 
     private void beginTracking() {
+        mMap.clear();
     }
 
 
@@ -101,6 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
         // Add a marker in Sydney and move the camera
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -114,9 +112,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestPermissionsSafely(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION_CODE);
 
-        }else{
+        } else {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.getUiSettings().setCompassEnabled(true);
 
         }
 
@@ -133,12 +133,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LocationManager.GPS_PROVIDER,
                     MIN_TIME_BW_UPDATES,
                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
             Location location = locationManager
                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location != null) {
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
 //                LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
 //                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+
             } else {
                 //showMessage(getResources().getString(R.string.no_location), MessageType.ERROR, AlertType.TOAST);
             }
@@ -150,6 +152,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Location location = locationManager
                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location != null) {
+
 //                LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
 //                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
@@ -180,7 +183,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (int i = 0, len = permissions.length; i < len; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                     // user rejected the permission
-            getLastUnknownLocation();
+                    getLastUnknownLocation();
                 }
             }
         }
@@ -189,20 +192,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        if(checkBtn){
-            MLocation location1 = new MLocation(location.getLatitude(),location.getLongitude());
-            if(mLine.size() == 0){
+        mLocation = location;
+        if (checkBtn) {
+            if (mLine.size() == 0) {
+                MLocation location1 = new MLocation(location.getLatitude(), location.getLongitude());
                 mLine.add(location1);
+            } else {
+                int ss = mLine.size()-1;
+                MLocation origin = mLine.get(ss);
+                MLocation dest = new MLocation(location.getLatitude(), location.getLongitude());
+                mLine.add(dest);
+                LatLng mLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+                PolylineOptions options = new PolylineOptions().width(5).color(Color.RED).geodesic(true);
+                options.add(new LatLng(origin.getLat(), origin.getLongt()), new LatLng(dest.getLat(), dest.getLongt()));
+                mMap.addPolyline(options);
             }
-            MLocation location2 = mLine.get(mLine.size());
-            mLine.add(location1);
-            LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .add(new LatLng(location2.getLat(),location2.getLongt()),new LatLng(location1.getLat(),location1.getLongt()))
-                    .width(5)
-                    .color(Color.RED));
-
         }
     }
 
@@ -218,6 +223,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onProviderDisabled(String provider) {
+
+    }
+
+    public void addMarker(LatLng latLng) {
+        MarkerOptions options = new MarkerOptions();
+        options.position(latLng);
+        Marker marker = mMap.addMarker(options);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        mMap.clear();
+        addMarker(latLng);
 
     }
 }
