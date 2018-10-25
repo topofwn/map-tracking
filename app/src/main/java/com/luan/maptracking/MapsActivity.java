@@ -28,12 +28,15 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.luan.maptracking.SplashActivity.LOCATION_KEY_LATN;
+import static com.luan.maptracking.SplashActivity.LOCATION_KEY_LONGT;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, android.location.LocationListener, GoogleMap.OnMapClickListener {
     private static final int REQUEST_ACCESS_LOCATION_CODE = 16;
     private boolean checkBtn = false;
     private GoogleMap mMap;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
-    private Location mLocation;
+    private MLocation mLocation;
     private static final long MIN_TIME_BW_UPDATES = 1000; // 1 seconds
     private Button starButton;
     private GoogleApiClient apiClient;
@@ -43,6 +46,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        Bundle bd = this.getIntent().getExtras();
+        if(bd != null) {
+            mLocation = new MLocation(bd.getDouble(LOCATION_KEY_LATN),bd.getDouble(LOCATION_KEY_LONGT));
+        }else {
+            mLocation = new MLocation(10.7505117,106.647176117);
+        }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -68,7 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     stopTracking();
                     starButton.setBackgroundResource(R.drawable.bg_button_color_unpressed);
                 }
-                LatLng na = new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+                LatLng na = new LatLng(mLocation.getLat(), mLocation.getLongt());
                 addMarker(na);
                 checkBtn = !checkBtn;
             }
@@ -192,7 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        mLocation = location;
+        mLocation = new MLocation(location.getLatitude(),location.getLongitude());
         if (checkBtn) {
             if (mLine.size() == 0) {
                 MLocation location1 = new MLocation(location.getLatitude(), location.getLongitude());
