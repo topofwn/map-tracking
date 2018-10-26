@@ -5,7 +5,7 @@ public class MLocation {
     private double longt;
 
 
-    public MLocation(double la, double lo){
+    public MLocation(double la, double lo) {
         this.lat = la;
         this.longt = lo;
     }
@@ -14,12 +14,12 @@ public class MLocation {
         return lat;
     }
 
-    public double getLongt() {
-        return longt;
-    }
-
     public void setLat(double lat) {
         this.lat = lat;
+    }
+
+    public double getLongt() {
+        return longt;
     }
 
     public void setLongt(double longt) {

@@ -47,10 +47,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         Bundle bd = this.getIntent().getExtras();
-        if(bd != null) {
-            mLocation = new MLocation(bd.getDouble(LOCATION_KEY_LATN),bd.getDouble(LOCATION_KEY_LONGT));
-        }else {
-            mLocation = new MLocation(10.7505117,106.647176117);
+        if (bd != null) {
+            mLocation = new MLocation(bd.getDouble(LOCATION_KEY_LATN), bd.getDouble(LOCATION_KEY_LONGT));
+        } else {
+            mLocation = new MLocation(10.7505117, 106.647176117);
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -202,13 +202,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        mLocation = new MLocation(location.getLatitude(),location.getLongitude());
+        mLocation = new MLocation(location.getLatitude(), location.getLongitude());
         if (checkBtn) {
             if (mLine.size() == 0) {
                 MLocation location1 = new MLocation(location.getLatitude(), location.getLongitude());
                 mLine.add(location1);
             } else {
-                int ss = mLine.size()-1;
+                int ss = mLine.size() - 1;
                 MLocation origin = mLine.get(ss);
                 MLocation dest = new MLocation(location.getLatitude(), location.getLongitude());
                 mLine.add(dest);

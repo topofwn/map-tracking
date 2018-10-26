@@ -7,13 +7,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ProgressBar;
 
-public class SplashActivity extends BaseActivity implements  android.location.LocationListener {
+public class SplashActivity extends BaseActivity implements android.location.LocationListener {
     private static final int REQUEST_ACCESS_LOCATION_CODE = 11;
     public static final String LOCATION_KEY_LATN = "LOCATION_KEY_LATN";
     public static final String LOCATION_KEY_LONGT = "LOCATION_KEY_LONGT";
@@ -21,6 +20,7 @@ public class SplashActivity extends BaseActivity implements  android.location.Lo
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
     private Location mLocation;
     private static final long MIN_TIME_BW_UPDATES = 1000; // 1 seconds
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,10 +38,10 @@ public class SplashActivity extends BaseActivity implements  android.location.Lo
 
     @Override
     protected void initData() {
-        if (hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)&& hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
+        if (hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) && hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             getLastUnknownLocation();
 
-        }else{
+        } else {
             requestPermissionsSafely(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION_CODE);
         }
@@ -79,7 +79,7 @@ public class SplashActivity extends BaseActivity implements  android.location.Lo
             Location location = locationManager
                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location != null) {
-                        gotoMapScreen(location);
+                gotoMapScreen(location);
 //                LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
 //                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
@@ -92,11 +92,12 @@ public class SplashActivity extends BaseActivity implements  android.location.Lo
 
     private void gotoMapScreen(Location loc) {
         progress.setProgress(90);
-        Bundle bd =new Bundle();
-        bd.putDouble(LOCATION_KEY_LATN,loc.getLatitude());
-        bd.putDouble(LOCATION_KEY_LONGT,loc.getLongitude());
-        ActivityUtils.startActivityWithData(SplashActivity.this,MapsActivity.class,true,bd);
+        Bundle bd = new Bundle();
+        bd.putDouble(LOCATION_KEY_LATN, loc.getLatitude());
+        bd.putDouble(LOCATION_KEY_LONGT, loc.getLongitude());
+        ActivityUtils.startActivityWithData(SplashActivity.this, MapsActivity.class, true, bd);
     }
+
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

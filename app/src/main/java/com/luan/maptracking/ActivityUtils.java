@@ -88,7 +88,6 @@ public class ActivityUtils {
     }
 
 
-
     public static void addPermissionList(Activity activity, String[] permissions, int requestCode) {
         if (Build.VERSION.SDK_INT >= 23) {
             ArrayList addPermissions = new ArrayList();
