@@ -89,6 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void stopTracking() {
+        mMap.clear();
     }
 
     private void beginTracking() {
