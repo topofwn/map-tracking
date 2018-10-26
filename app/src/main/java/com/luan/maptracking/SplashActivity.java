@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class SplashActivity extends BaseActivity implements android.location.LocationListener {
     private static final int REQUEST_ACCESS_LOCATION_CODE = 11;
@@ -40,7 +41,6 @@ public class SplashActivity extends BaseActivity implements android.location.Loc
     protected void initData() {
         if (hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) && hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             getLastUnknownLocation();
-
         } else {
             requestPermissionsSafely(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION_CODE);
@@ -69,6 +69,7 @@ public class SplashActivity extends BaseActivity implements android.location.Loc
 //                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
 
             } else {
+                Toast.makeText(this, "No location found", Toast.LENGTH_SHORT).show();
                 //showMessage(getResources().getString(R.string.no_location), MessageType.ERROR, AlertType.TOAST);
             }
         } else if (isGPSEnabled) {
@@ -84,7 +85,7 @@ public class SplashActivity extends BaseActivity implements android.location.Loc
 //                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
             } else {
-
+                Toast.makeText(this, "No location found", Toast.LENGTH_SHORT).show();
                 //showMessage(getResources().getString(R.string.no_location), MessageType.ERROR, AlertType.TOAST);
             }
         }
@@ -114,7 +115,8 @@ public class SplashActivity extends BaseActivity implements android.location.Loc
 
     @Override
     public void onLocationChanged(Location location) {
-
+        gotoMapScreen(location
+        );
     }
 
     @Override
