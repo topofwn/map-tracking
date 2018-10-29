@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -139,6 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         boolean isNetworkEnabled = locationManager
                 .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
         if (isNetworkEnabled) {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
@@ -148,14 +150,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Location location = locationManager
                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location != null) {
+                Toast.makeText(this, "Location found", Toast.LENGTH_SHORT).show();
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
 //                LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 15.0f));
 
             } else {
+                Toast.makeText(this, "No location found", Toast.LENGTH_SHORT).show();
                 //showMessage(getResources().getString(R.string.no_location), MessageType.ERROR, AlertType.TOAST);
             }
-        } else if (isGPSEnabled) {
+        }
+
+        if (isGPSEnabled) {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
                     MIN_TIME_BW_UPDATES,
@@ -163,12 +169,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Location location = locationManager
                     .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location != null) {
-
-//                LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
+                Toast.makeText(this, "Location found", Toast.LENGTH_SHORT).show();
+//              LatLng mLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 15.0f));
                 //mPresenter.getWeatherData(location.getLatitude(), location.getLongitude());
             } else {
-
+                Toast.makeText(this, "No location found", Toast.LENGTH_SHORT).show();
                 //showMessage(getResources().getString(R.string.no_location), MessageType.ERROR, AlertType.TOAST);
             }
         }
@@ -213,7 +219,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MLocation origin = mLine.get(ss);
                 MLocation dest = new MLocation(location.getLatitude(), location.getLongitude());
                 mLine.add(dest);
-                LatLng mLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+                LatLng mLatLng = new LatLng(dest.getLat(), dest.getLongt());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
                 PolylineOptions options = new PolylineOptions().width(5).color(Color.RED).geodesic(true);
                 options.add(new LatLng(origin.getLat(), origin.getLongt()), new LatLng(dest.getLat(), dest.getLongt()));
@@ -246,7 +253,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapClick(LatLng latLng) {
-        mMap.clear();
+  //
+            mMap.clear();
         addMarker(latLng);
 
     }
