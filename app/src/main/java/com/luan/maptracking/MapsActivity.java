@@ -90,8 +90,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 InputLocationDialog dialog = new InputLocationDialog(MapsActivity.this,(MLocation loc)->{
-                   LatLng lt = new LatLng(loc.getLat(),loc.getLongt());
-                   addMarker(lt);
+                    if(loc != null) {
+                        LatLng lt = new LatLng(loc.getLat(), loc.getLongt());
+                        addMarker(lt);
+                    }
                 });
                 dialog.show();
             }

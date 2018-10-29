@@ -36,7 +36,7 @@ public class InputLocationDialog extends Dialog {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(la.getText()!= null  && lo.getText() != null){
+                if(!la.getText().toString().equals("")  && !lo.getText().toString().equals("")){
                     MLocation location = new MLocation(Double.parseDouble(la.getText().toString()),Double.parseDouble(lo.getText().toString()));
                     mListener.setInput(location);
                     dismiss();
