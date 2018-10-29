@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,7 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MLocation mLocation;
     private static final long MIN_TIME_BW_UPDATES = 1000; // 1 seconds
     private Button starButton;
-    private GoogleApiClient apiClient;
+    private ImageButton search;
     private List<MLocation> mLine;
 
     @Override
@@ -84,9 +85,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 checkBtn = !checkBtn;
             }
         });
-
+        search = findViewById(R.id.btnFind);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputLocationDialog dialog = new InputLocationDialog(MapsActivity.this,(MLocation loc)->{
+                   LatLng lt = new LatLng(loc.getLat(),loc.getLongt());
+                   addMarker(lt);
+                });
+                dialog.show();
+            }
+        });
         mapFragment.getMapAsync(this);
 
+    }
+
+    private void gotoThisPosition(MLocation loc) {
     }
 
     private void stopTracking() {
